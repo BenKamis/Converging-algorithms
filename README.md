@@ -18,3 +18,5 @@ Graphs generated include:
 All fractions tested by the algorithms as they converge to a user-input value
 The number of loop iterations the algorithms took to reach the float for a range of values
 Which algorithm was faster for different values
+
+File reupload 1: Some rounding issues, now resolved.
