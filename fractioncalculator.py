@@ -7,7 +7,7 @@ Created on Sat Jan 7 14:37:09 2023
 
 File: fractioncalculator.py
     
-Description: This is just a fun project I came up with. These are two algorithms that
+Description: This is just a fun project I came up with. These are three algorithms that
 start at 0 or 1 and converge to a float and return a fraction. The fraction is only
 simplified if the float input shares a common factor with 10, aka 2 or 5.
 """
@@ -19,7 +19,7 @@ def user_input():
     '''
     name: user_input
     This function takes a user input and either calls itself, another function,
-    or two other functions based on the input.
+    or three other functions based on the input.
     parameters: None
     return: None
     '''
@@ -389,7 +389,7 @@ def graph_generator(choice):
     # Second graph
     plt.xlabel("Float tested")
     plt.ylabel("Number of fraction iteration steps")
-    plt.title("Comparing two fraction finding algorithms")
+    plt.title("Comparing three fraction finding algorithms")
     plt.text(0, max(count_2_list)*0.95, "Algorithm 1", size = 15, c = "b")
     plt.text(0, max(count_2_list)*0.85, "Algorithm 2", size = 15, c = "r")    
     plt.text(0, max(count_2_list)*0.75, "Algorithm 3", size = 15, c = "gold")
