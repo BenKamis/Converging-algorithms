@@ -28,17 +28,112 @@ def user_input():
     if input_num == "exit":
         main()
         user_input()
-    # If the user inputs a float, both algorithms are applied and a graph is
+    # If the user inputs a float, the three algorithms are applied and a graph is
     # displayed with the count times for each
     try:
         float(input_num)
         fraction_calc_method_one(input_num, True)
         fraction_calc_method_two(input_num, True)
+        fraction_calc_method_three(input_num, True)
         user_input()
     # If the user does not input a float or "exit", this function is re-run
     except ValueError:
         print("Please input a float next time.")      
         user_input()
+
+def fraction_calc_method_three(input_num, boo):
+    '''
+    name: fraction_calc_method_three
+    This is a method of converging a fraction to a float that I wrote after the
+    other two, because I didn't think it would always converge. However, for
+    all floats I've tested, it does converge. The fraction is initially 1/1.
+    After each loop, if the decimal places are not equal to the fraction, one of
+    two actions is performed: If the fraction is too small, the numerator is increased
+    by 1. If the fraction is too lagre, the denominator is increased by 1. After
+    each loop where one of these actions is performed, the count increases by 1.
+    The graph of the fraction's "journey" toward the float is graphed if it was
+    user-input.
+    parameters: A float to converge to and a boolean that controls whether or
+    not to display the graph
+    return: The number of loop iterations required to converge, an int
+    '''
+    # The fraction converging only concerns the digits after the decimal point.
+    # This part removes the concern for the digits before the decimal
+    input_num = float(input_num)
+    # A small float is added to input_num so that numbers such as 0.5 round up
+    # instead of down. This is 1e-8, and decimals are rounded to 7 places after
+    # this step, so this doesn't change the output at all.
+    rounded_input = round(input_num + 0.00000001)
+    # After 7 digits of decimals, the fraction is approximated to the float.
+    decimals = round(input_num - rounded_input, 7)
+    # All rounded_up variable placements are explained in method_two, see that
+    # function for more information. It boils down to this function not working
+    # for negative floats, so by changing the rounding, it is fixed.
+    rounded_up = False
+    if decimals < 0:
+        decimals = abs(decimals)
+        rounded_up = True
+    
+    # Initializing variables
+    numerator = 1
+    denominator = 1
+    count = 0
+    # Graph is only generated for user-inputted floats
+    if boo == True:
+        x_axis = []
+        y_axis = []
+    # In the case that the fraction should approach 0, it will get infinitely
+    # close (as the denominator tends to infinity) but never exactly arrive
+    # (without rounding) and drive up the computation time. This special case
+    # is solved in this if statement, and this check will count as 0 "counts".
+    if decimals == 0:
+        numerator = 0
+        denominator = 1
+    test_frac = round(numerator / denominator, 7)
+    while test_frac != decimals:
+        # Graph is only generated for user-inputted floats
+        if boo == True:
+            x_axis.append(count)
+            if rounded_up == True:
+                y_axis.append(-test_frac + rounded_input)
+            else:
+                y_axis.append(test_frac + rounded_input)
+        # If the fraction is too low, add 1 to the numerator
+        if test_frac < decimals:
+            numerator += 1
+        # If the fraction is too high, add 1 to the denominator
+        elif test_frac > decimals:
+            denominator += 1
+        # Re-calculate the fraction that's being tested and increase the iteration count
+        test_frac = numerator / denominator
+        count += 1
+    # Graph is only generated for user-inputted floats
+    if boo == True:
+        x_axis.append(count)
+        if rounded_up == True:
+            y_axis.append(-test_frac + rounded_input)
+        else:
+            y_axis.append(test_frac + rounded_input)
+        plt.plot(x_axis, y_axis, c = "gold")
+        plt.scatter(count, input_num, s = 50, c = "gold")
+        plt.text(count, input_num+0.1, "Algorithm 3", size = 15, c = "gold")
+        plt.xlabel("Number of steps")
+        plt.ylabel("Fraction reached (in decimal form)")
+        plt.title("Fraction progress toward float input")
+        # The graph is shown now that all three functions have been applied to the float
+        # (methods 1 and 2 are run first)
+        plt.show()
+    # The digits before the decimal point were disregarded, they are added back here
+    # and the fraction is an improper fraction if the float was not between -1 and 1
+    if rounded_up == True:
+        final_numerator = denominator * rounded_input - numerator
+    else:
+        final_numerator = denominator * rounded_input + numerator
+    # Output message is only sent for user-inputted floats
+    if boo == True:
+        print("Third algorithm calculated:", final_numerator, "/", denominator, "in:", count, "steps")
+    
+    return(count)
 
 def fraction_calc_method_one(input_num, boo):
     '''
@@ -57,7 +152,10 @@ def fraction_calc_method_one(input_num, boo):
     # The fraction converging only concerns the digits after the decimal point.
     # This part removes the concern for the digits before the decimal
     input_num = float(input_num)
-    rounded_input = round(input_num)
+    # A small float is added to input_num so that numbers such as 0.5 round up
+    # instead of down. This is 1e-8, and decimals are rounded to 7 places after
+    # this step, so this doesn't change the output at all.
+    rounded_input = round(input_num + 0.00000001)
     # After 7 digits of decimals, the fraction is approximated to the float.
     decimals = round(input_num - rounded_input, 7)
     
@@ -65,21 +163,20 @@ def fraction_calc_method_one(input_num, boo):
     numerator = 0
     denominator = 1
     count = 0
-    test_frac = round(numerator / denominator, 7)
     # Graph is only generated for user-inputted floats
     if boo == True:
         x_axis = []
         y_axis = []
-    
+    test_frac = round(numerator / denominator, 7)
     while test_frac != decimals:
         # Graph is only generated for user-inputted floats
         if boo == True:
             x_axis.append(count)
             y_axis.append(test_frac + rounded_input)
-        # If the fraction is too low, add to the numerator
+        # If the fraction is too low, add 1 to the numerator
         if test_frac < decimals:
             numerator += 1
-        # If the fraction is too high, undo the last addition and add to the denominator
+        # If the fraction is too high, undo the last addition and add 1 to the denominator
         elif test_frac > decimals:
             numerator -= 1
             denominator += 1
@@ -90,9 +187,9 @@ def fraction_calc_method_one(input_num, boo):
     if boo == True:
         x_axis.append(count)
         y_axis.append(test_frac + rounded_input)
-        plt.plot(x_axis, y_axis, c = "b")
-        plt.scatter(count, input_num, s = 50, c = "g")
-        plt.text(count, input_num+0.1, "Algorithm 1", size = 15, c = "b")
+        plt.plot(x_axis, y_axis, c = "blue")
+        plt.scatter(count, input_num, s = 50, c = "blue")
+        plt.text(count, input_num+0.1, "Algorithm 1", size = 15, c = "blue")
         plt.xlabel("Number of steps")
         plt.ylabel("Fraction reached (in decimal form)")
         plt.title("Fraction progress toward float input")
@@ -124,7 +221,10 @@ def fraction_calc_method_two(input_num, boo):
     # The fraction converging only concerns the digits after the decimal point.
     # This part removes the concern for the digits before the decimal
     input_num = float(input_num)
-    rounded_input = round(input_num)
+    # A small float is added to input_num so that numbers such as 0.5 round up
+    # instead of down. This is 1e-8, and decimals are rounded to 7 places after
+    # this step, so this doesn't change the output at all.
+    rounded_input = round(input_num + 0.00000001)
     # After 7 digits of decimals, the fraction is approximated to the float.
     decimals = round(input_num - rounded_input, 7)
     # A bit of an odd fix I had was when the float was negative and rounded down
@@ -187,14 +287,12 @@ def fraction_calc_method_two(input_num, boo):
             y_axis.append(-test_frac + rounded_input)
         else:
             y_axis.append(test_frac + rounded_input)
-        plt.plot(x_axis, y_axis, c = "r")
-        plt.scatter(count, input_num, s = 50, c = "g")
-        plt.text(count, input_num-0.1, "Algorithm 2", size = 15, c = "r")
+        plt.plot(x_axis, y_axis, c = "red")
+        plt.scatter(count, input_num, s = 50, c = "red")
+        plt.text(count, input_num-0.1, "Algorithm 2", size = 15, c = "red")
         plt.xlabel("Number of steps")
         plt.ylabel("Fraction reached (in decimal form)")
         plt.title("Fraction progress toward float input")
-        # The graph is shown now that both functions have been applied to the float
-        plt.show()
     
     # If the input was rounded up, the numerator must be subtracted, as
     # explained a few comments up
@@ -212,7 +310,7 @@ def fraction_calc_method_two(input_num, boo):
 def graph_generator(choice):
     '''
     name: graph_generator
-    Using both converging algorithms on values over an interval of 1, two graphs
+    Using the converging algorithms on values over an interval of 1, two graphs
     are created. The first graph shows the number of loop iterations required fpr
     each algorithm to converge for each value tested. The second graph shows
     which algorithm converged faster for each point and how many loop iterations
@@ -229,31 +327,50 @@ def graph_generator(choice):
     intervals = round(float(choice), 7)
     count_1_list = []
     count_2_list = []
+    count_3_list = []
     num_list = []
     compare_list = []
     while input_num <= round(end_num - float(choice), 7):
-        # Both algorithms are applied to each float in the interval. The number of
+        # The three algorithms are applied to each float in the interval. The number of
         # loop iterations to reach the number is added to a list fo each algorithm
         count_1 = fraction_calc_method_one(round(input_num, 7), False)
         count_2 = fraction_calc_method_two(round(input_num, 7), False)
+        count_3 = fraction_calc_method_three(round(input_num, 7), False)
         count_1_list.append(count_1)
         count_2_list.append(count_2)
+        count_3_list.append(count_3)
         num_list.append(input_num)
-        # For each float tested, the algorithm with a lower loop iteration number
+        # For each float tested, the algorithms with a lower loop iteration number
         # and the number of iterations is saved in a new list with other attributes
-        # to be plotted
-        if count_1 < count_2:
+        # to be plotted. Note: I have only seen yellow, orange, and black dots.
+        if count_1 < count_2 and count_1 < count_3:
             lower_count = count_1
             color = "b"
             size = 5
-        elif count_1 > count_2:
+        elif count_2 < count_1 and count_2 < count_3:
             lower_count = count_2
             color = "r"
             size = 5
-        elif count_1 == count_2:
+        elif count_3 < count_1 and count_3 < count_2:
             lower_count = count_2
-            color = "g"
+            color = "gold"
+            size = 5  
+        elif count_1 == count_2 and count_1 != count_3:
+            lower_count = count_2
+            color = "purple"
             size = 40
+        elif count_2 == count_3 and count_2 != count_1:
+            lower_count = count_2
+            color = "orange"
+            size = 40
+        elif count_1 == count_3 and count_1 != count_2:
+            lower_count = count_2
+            color = "green"
+            size = 40
+        elif count_1 == count_2 and count_1 == count_3:
+            lower_count = count_2
+            color = "black"
+            size = 60
     
         # Each float tested gets a compare_list with attributes to be plotted
         # one by one
@@ -266,6 +383,7 @@ def graph_generator(choice):
     plt.title("Fraction progress toward float input")
     plt.scatter(num_list, count_1_list, s = 5, c = "b")    
     plt.scatter(num_list, count_2_list, s = 5, c = "r")
+    plt.scatter(num_list, count_3_list, s = 5, c = "gold")
     plt.grid(visible=True, which='major', color='black', linestyle='-', alpha = 0.4)
     plt.show()
     # Second graph
@@ -273,67 +391,12 @@ def graph_generator(choice):
     plt.ylabel("Number of fraction iteration steps")
     plt.title("Comparing two fraction finding algorithms")
     plt.text(0, max(count_2_list)*0.95, "Algorithm 1", size = 15, c = "b")
-    plt.text(0, max(count_2_list)*0.85, "Algorithm 2", size = 15, c = "r")
-    # Sorting the compare list so that the green points are plotted last and stand out more
-    compare_list = sorted(compare_list, key=itemgetter(-2))
-    # Each point in the second graph being plotted one by one
-    save_green_point = None
+    plt.text(0, max(count_2_list)*0.85, "Algorithm 2", size = 15, c = "r")    
+    plt.text(0, max(count_2_list)*0.75, "Algorithm 3", size = 15, c = "gold")
     for i in compare_list:
         plt.scatter(i[3], i[0], c = i[1], s = i[2])
-        # Lines are created between the green points to show the curve of the line
-        if i[1] == "g":
-            if save_green_point != None:
-                plt.plot([save_green_point[3], i[3]], [save_green_point[0], i[0]], c = 'g', alpha = 0.5)
-            save_green_point = i
     plt.grid(visible=True, which='major', color='black', linestyle='-', alpha = 0.4)
     plt.show()
-    
-    
-    '''
-    I generated these graphs, but they weren't too insightful. Feel free to
-    un-comment them out and work with them if you'd like!
-    
-    # Generating a graph of floats from 0 through 1/2
-    for i in compare_list:
-        if i[3] < 0.5:
-            plt.minorticks_on() 
-            plt.scatter(i[3], i[0], c = i[1], s = i[2])
-    plt.xlabel("Float tested")
-    plt.ylabel("Number of fraction iteration steps")
-    plt.title("Faster algorithm fraction progress toward float input (0-1/2)")
-    plt.grid(visible=True, which='major', color='black', linestyle='-', alpha = 0.4)
-    plt.grid(visible=True, which='minor', color='gray', linestyle='-', alpha = 0.2)
-    plt.plot([0.005, 0.495], [200, 395], c = 'r', alpha = 0.3)
-    plt.plot([0.01, 0.49], [100, 195], c = 'r', alpha = 0.3)
-    plt.plot([0.02, 0.46], [50, 93], c = 'r', alpha = 0.3)
-    plt.show()
-    
-    # Generating a graph of floats from 1/2 through 2/3
-    for i in compare_list:
-        if i[3] > 0.5 and i[3] < 0.66666666666:
-            plt.minorticks_on() 
-            plt.scatter(i[3], i[0], c = i[1], s = i[2])
-    plt.xlabel("Float tested")
-    plt.ylabel("Number of fraction iteration steps")
-    plt.title("Faster algorithm fraction progress toward float input (1/2-2/3)")
-    plt.grid(visible=True, which='major', color='black', linestyle='-', alpha = 0.4)
-    plt.grid(visible=True, which='minor', color='gray', linestyle='-', alpha = 0.2)
-    plt.show()
-    
-    # Generating a graph of floats from 2/3 through 1
-    for i in compare_list:
-        if i[3] > 0.66666666666:
-            plt.minorticks_on() 
-            plt.scatter(i[3], i[0], c = i[1], s = i[2])   
-    plt.xlabel("Float tested")
-    plt.ylabel("Number of fraction iteration steps")
-    plt.title("Faster algorithm fraction progress toward float input (2/3-1)")
-    plt.grid(visible=True, which='major', color='black', linestyle='-', alpha = 0.4)
-    plt.grid(visible=True, which='minor', color='gray', linestyle='-', alpha = 0.2)
-    plt.show()
-    main()
-    '''
-    
     
 def first_user_input():
     '''
@@ -350,7 +413,7 @@ def first_user_input():
 def main():
     
     choice = first_user_input()
-    # Applies both converging algorithms to a user-inputted float
+    # Applies all three converging algorithms to a user-inputted float
     if choice == "1":
         user_input()
     # Displays graphs for floats over a range
